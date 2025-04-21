@@ -1,12 +1,14 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters, status
+from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from materials.models import Course
 from users.models import Payment, User, Subscribe
 from users.serializer import PaymentSerializer, SubscribeSerializer
+from users.services import create_product, create_price, create_session
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -17,7 +19,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
     ordering_fields = ('date')
 
 
-class SubscribeToCourse(APIView):
+class SubscribeToCourseAPIView(APIView):
     def post(self, request, *args, **kwargs):
         user_id = request.data.get('user_id', None)
         course_id = request.data.get('course_id', None)
@@ -51,3 +53,20 @@ class SubscribeToCourse(APIView):
             new_sub = Subscribe.objects.create(user=user, course=course, payment=payment)
             serializer = SubscribeSerializer(new_sub)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class PaymentCreateAPIView(CreateAPIView):
+    serializer_class = PaymentSerializer
+    queryset = Payment.objects.all()
+
+    def perform_create(self, serializer):
+        payment = serializer.save()
+        if payment.lesson:
+            product = create_product(payment.lesson.name)
+        else:
+            product = create_product(payment.course.name)
+        amount = create_price(payment.amount, product)
+        session_id, payment_url = create_session(amount)
+        payment.session_id = session_id
+        payment.url = payment_url
+        payment.save()

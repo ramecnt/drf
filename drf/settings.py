@@ -9,17 +9,20 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2rxp@82^#!%2t4pvu4+ad)d3la4j@=wtpcl$d$6c0butb6*4aa'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,7 +41,8 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'django_filters',
-    
+    'drf_yasg',
+
     'users',
     'materials',
 ]
@@ -83,8 +87,8 @@ REST_FRAMEWORK = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'nikolay',
-        'PORT': 5433,
+        'NAME': os.getenv('DATABASE_NAME'),
+        'PORT': os.getenv('DATABASE_PORT'),
     }
 }
 
@@ -131,3 +135,5 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media/'
 
 AUTH_USER_MODEL = 'users.User'
+
+STRIPE_KEY = os.getenv('STRIPE_KEY')
