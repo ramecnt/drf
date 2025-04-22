@@ -3,12 +3,12 @@ from rest_framework import viewsets, generics
 from materials.models import Course, Lesson
 from materials.paginators import CoursePaginator
 from materials.serializer import CourseSerializer, LessonSerializer, CourseDetailSerializer
-from materials.validators import URLValidator
 
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     pagination_class = CoursePaginator
+
 
     def get_serializer_class(self):
         if self.action == "retrieve":
@@ -18,7 +18,6 @@ class CourseViewSet(viewsets.ModelViewSet):
 
 class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerializer
-    validators = [URLValidator(field='url')]
 
 
 class LessonListAPIView(generics.ListAPIView):

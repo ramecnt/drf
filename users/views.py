@@ -21,13 +21,13 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
 class SubscribeToCourseAPIView(APIView):
     def post(self, request, *args, **kwargs):
-        user_id = request.data.get('user_id', None)
-        course_id = request.data.get('course_id', None)
-        payment_id = request.data.get('payment_id', None)
+        user_id = request.data.get('user', None)
+        course_id = request.data.get('course', None)
+        payment_id = request.data.get('payment', None)
 
         if user_id is None or course_id is None or payment_id is None:
             return Response(
-                {"error": "Необходимо указать 'user_id', 'course_id' и 'payment_id'"},
+                {"error": "Необходимо указать 'user', 'course' и 'payment'"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
